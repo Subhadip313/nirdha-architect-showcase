@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/expertise", label: "Expertise" },
-  { to: "/process", label: "Process" },
-  { to: "/security", label: "Security" },
-  { to: "/clients", label: "Clients" },
-  { to: "/contact", label: "Contact" },
+  { to: "/", hash: "#home", label: "Home" },
+  { to: "/", hash: "#expertise", label: "Expertise" },
+  { to: "/process-security", hash: "#process", label: "Process" },
+  { to: "/process-security", hash: "#security", label: "Security" },
+  { to: "/clients-contact", hash: "#clients", label: "Clients" },
+  { to: "/clients-contact", hash: "#contact", label: "Contact" },
 ];
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -24,6 +25,30 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => setMobileOpen(false), [location]);
+
+  // Handle hash scrolling after navigation
+  useEffect(() => {
+    if (location.hash) {
+      setTimeout(() => {
+        const el = document.querySelector(location.hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [location]);
+
+  const handleNavClick = (to: string, hash: string) => {
+    if (location.pathname === to) {
+      // Same page, just scroll
+      const el = document.querySelector(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate(to + hash);
+    }
+  };
+
+  const isActive = (to: string, hash: string) => {
+    return location.pathname === to && location.hash === hash;
+  };
 
   return (
     <nav
@@ -40,17 +65,17 @@ const Navbar = () => {
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
+            <button
+              key={link.label}
+              onClick={() => handleNavClick(link.to, link.hash)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                location.pathname === link.to
+                isActive(link.to, link.hash)
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               }`}
             >
               {link.label}
-            </Link>
+            </button>
           ))}
         </div>
 
@@ -74,17 +99,20 @@ const Navbar = () => {
           >
             <div className="flex flex-col p-4 gap-1">
               {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                    location.pathname === link.to
+                <button
+                  key={link.label}
+                  onClick={() => {
+                    handleNavClick(link.to, link.hash);
+                    setMobileOpen(false);
+                  }}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-all text-left ${
+                    isActive(link.to, link.hash)
                       ? "text-primary bg-primary/10"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {link.label}
-                </Link>
+                </button>
               ))}
             </div>
           </motion.div>
