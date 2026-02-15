@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+
 import Navbar from "@/components/Navbar";
 import Index from "./pages/Index";
 import ProcessSecurity from "./pages/ProcessSecurity";
@@ -17,17 +18,16 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Navbar />
-        <AnimatePresence mode="wait">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/process-security" element={<ProcessSecurity />} />
-            <Route path="/clients-contact" element={<ClientsContact />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AnimatePresence>
-      </BrowserRouter>
+      <Navbar />
+
+      <AnimatePresence mode="wait">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/process-security" element={<ProcessSecurity />} />
+          <Route path="/clients-contact" element={<ClientsContact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AnimatePresence>
     </TooltipProvider>
   </QueryClientProvider>
 );
