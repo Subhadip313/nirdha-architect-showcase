@@ -15,82 +15,39 @@ const navLinks = [
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // 🔴 NEW: track active section hash while scrolling
-  const [activeHash, setActiveHash] = useState<string>("");
-
-  /* ---------------- SCROLL SHADOW ---------------- */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ---------------- CLOSE MOBILE MENU ON ROUTE CHANGE ---------------- */
-  useEffect(() => setMobileOpen(false), [location.pathname]);
+  useEffect(() => setMobileOpen(false), [location]);
 
-  /* ---------------- SCROLL TO HASH AFTER NAVIGATION ---------------- */
+  // Handle hash scrolling after navigation
   useEffect(() => {
-    if (!location.hash) return;
-
-    const el = document.querySelector(location.hash);
-    if (el) {
+    if (location.hash) {
       setTimeout(() => {
-        el.scrollIntoView({ behavior: "smooth" });
-        setActiveHash(location.hash); // 🔴 NEW: sync active state
+        const el = document.querySelector(location.hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
-  }, [location.hash]);
+  }, [location]);
 
-  /* ---------------- 🔴 NEW: SCROLL-SPY (THE REAL FIX) ---------------- */
-  useEffect(() => {
-    const sections = navLinks
-      .filter((l) => l.to === location.pathname && l.hash)
-      .map((l) => document.querySelector(l.hash))
-      .filter(Boolean) as HTMLElement[];
-
-    if (!sections.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-        if (visible) {
-          setActiveHash(`#${visible.target.id}`);
-        }
-      },
-      {
-        rootMargin: "-30% 0px -50% 0px", // tuned for fixed navbar
-        threshold: [0.3, 0.6],
-      }
-    );
-
-    sections.forEach((section) => observer.observe(section));
-    return () => observer.disconnect();
-  }, [location.pathname]);
-
-  /* ---------------- NAV CLICK HANDLER ---------------- */
   const handleNavClick = (to: string, hash: string) => {
     if (location.pathname === to) {
+      // Same page, just scroll
       const el = document.querySelector(hash);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        setActiveHash(hash); // 🔴 NEW: instant highlight
-      }
+      if (el) el.scrollIntoView({ behavior: "smooth" });
     } else {
       navigate(to + hash);
     }
   };
 
-  /* ---------------- 🔴 UPDATED ACTIVE LOGIC ---------------- */
   const isActive = (to: string, hash: string) => {
-    if (location.pathname !== to) return false;
-    return activeHash === hash;
+    return location.pathname === to && location.hash === hash;
   };
 
   return (
@@ -105,7 +62,7 @@ const Navbar = () => {
           <span className="text-foreground/60">.in</span>
         </Link>
 
-        {/* ---------------- DESKTOP ---------------- */}
+        {/* Desktop */}
         <div className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => (
             <button
@@ -122,7 +79,7 @@ const Navbar = () => {
           ))}
         </div>
 
-        {/* ---------------- MOBILE TOGGLE ---------------- */}
+        {/* Mobile toggle */}
         <button
           className="md:hidden text-foreground p-2"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -131,7 +88,7 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* ---------------- MOBILE MENU ---------------- */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
