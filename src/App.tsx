@@ -6,11 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Index from "./pages/Index";
-import Expertise from "./pages/Expertise";
-import Security from "./pages/Security";
-import Process from "./pages/Process";
-import WhoIWorkWith from "./pages/WhoIWorkWith";
-import Contact from "./pages/Contact";
+import ProcessSecurity from "./pages/ProcessSecurity";
+import ClientsContact from "./pages/ClientsContact";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,11 +22,8 @@ const App = () => (
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/expertise" element={<Expertise />} />
-            <Route path="/security" element={<Security />} />
-            <Route path="/process" element={<Process />} />
-            <Route path="/clients" element={<WhoIWorkWith />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/process-security" element={<ProcessSecurity />} />
+            <Route path="/clients-contact" element={<ClientsContact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
